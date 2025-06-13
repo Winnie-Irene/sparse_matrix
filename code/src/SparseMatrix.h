@@ -26,6 +26,7 @@ public:
     SparseMatrix multiply(const SparseMatrix& other);
 
     void print();
+    void printToFile(const std::string& filen);
 };
 
 #endif
