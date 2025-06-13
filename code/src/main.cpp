@@ -18,7 +18,9 @@ int main() {
     try {
         SparseMatrix A(file1);
         SparseMatrix B(file2);
-        SparseMatrix result(0, 0);
+        SparseMatrix result = (choice == 1) ? A.add(B) :
+                      (choice == 2) ? A.subtract(B) :
+                      A.multiply(B);
 
         if (choice == 1)
             result = A.add(B);
@@ -31,8 +33,12 @@ int main() {
             return 1;
         }
 
-        std::cout << "Result:\n";
+        std::cout << "\nResult printed on screen:\n";
         result.print();
+
+        std::string outputFilename = "result.txt";
+        result.printToFile(outputFilename);
+        std::cout << "\nResult also written to file: " << outputFilename << "\n";
 
     } catch (const std::invalid_argument& e) {
         std::cerr << "Error: " << e.what() << "\n";
