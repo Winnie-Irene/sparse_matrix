@@ -40,14 +40,13 @@ SparseMatrix::SparseMatrix(const std::string& filePath) {
     while (std::getline(inFile, line)) {
         if (line.empty()) continue;
 
-        // Remove whitespace
         line.erase(remove_if(line.begin(), line.end(), ::isspace), line.end());
 
         if (line.front() != '(' || line.back() != ')') {
             throw std::invalid_argument("Input file has wrong format");
         }
 
-        line = line.substr(1, line.size() - 2); // remove ()
+        line = line.substr(1, line.size() - 2);
         std::stringstream ss(line);
         std::string r, c, v;
         if (!std::getline(ss, r, ',') || !std::getline(ss, c, ',') || !std::getline(ss, v)) {
@@ -67,6 +66,11 @@ void SparseMatrix::setElement(int row, int col, int value) {
     Node* newNode = new Node{row, col, value, nullptr};
 
     if (!head || (row < head->row) || (row == head->row && col < head->col)) {
+        if (head && head->row == row && head->col == col) {
+            head->val = value;
+            delete newNode;
+            return;
+        }
         newNode->next = head;
         head = newNode;
         return;
@@ -105,6 +109,24 @@ void SparseMatrix::print() {
         std::cout << "(" << curr->row << ", " << curr->col << ", " << curr->val << ")\n";
         curr = curr->next;
     }
+}
+
+void SparseMatrix::printToFile(const std::string& filename) {
+    std::ofstream outFile(filename);
+    if (!outFile.is_open()) {
+        throw std::invalid_argument("Cannot open output file");
+    }
+
+    outFile << "rows=" << rows << "\n";
+    outFile << "cols=" << cols << "\n";
+
+    Node* curr = head;
+    while (curr) {
+        outFile << "(" << curr->row << ", " << curr->col << ", " << curr->val << ")\n";
+        curr = curr->next;
+    }
+
+    outFile.close();
 }
 
 SparseMatrix SparseMatrix::add(const SparseMatrix& other) {
